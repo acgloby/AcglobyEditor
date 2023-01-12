@@ -48,12 +48,12 @@ Material:
     m_Floats:
     - Metallic: 0.5
     - _Gloss: 136
-    - _Metallic: 0.213
+    - _Metallic: 0.298
     - _Metalness: 0.675
     - _NormalScale: 1
-    - _Roughness: 0.078
+    - _Roughness: 0.401
     - _Smoothness: 0.5
     m_Colors:
-    - _MainColor: {r: 1, g: 1, b: 1, a: 1}
+    - _MainColor: {r: 0.4976415, g: 0.49827564, b: 0.5, a: 1}
     - _Metalness: {r: 0.6792453, g: 0.31078678, b: 0.31078678, a: 1}
   m_BuildTextureStacks: []

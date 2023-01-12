@@ -7,9 +7,10 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: URPDemo_ProceduralSky
+  m_Name: ProceduralSky
   m_Shader: {fileID: 4800000, guid: e76fb3cf7723b3442b16ce66980452e0, type: 3}
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _USE_AURORA
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -95,7 +96,7 @@ Material:
     - _SunSize: 0.08
     m_Colors:
     - _CloudBackColor: {r: 0.21698111, g: 0.12588999, b: 0.12588999, a: 1}
-    - _CloudColor: {r: 0.2496885, g: 0.25885227, b: 0.2924528, a: 1}
+    - _CloudColor: {r: 0.96862745, g: 0.97056174, b: 0.972549, a: 1}
     - _CloudColorHight: {r: 0.8490566, g: 0.8490566, b: 0.8490566, a: 1}
     - _CloudFrontColor: {r: 1, g: 0.43867922, b: 0.43867922, a: 1}
     - _DayHorColor: {r: 0.99272245, g: 1.1036412, b: 1.1646465, a: 1}

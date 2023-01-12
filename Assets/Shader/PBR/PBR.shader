@@ -14,7 +14,11 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" "RenderPipeline" = "UniversalPipeline"}
+        Tags 
+        {
+            "RenderType"="Opaque"
+            "Queue" = "Geometry"
+        }
 
         Pass
         {
@@ -22,7 +26,12 @@
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
             #include "PBRFunction.hlsl"
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS //主光源阴影
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE //主光源层级阴影是否开启
+            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS //额外光源阴影
+            #pragma multi_compile _ _SHADOWS_SOFT //软阴影
 
 
             #pragma vertex vert
@@ -126,8 +135,9 @@
 
                 half3 kS = F;
                 half3 kD = (1-kS)*(1-Metallic);
+                half shadow = MainLightRealtimeShadow(TransformWorldToShadowCoord(i.worldPos));
                 //直接光漫反射
-                half3 directDiffuse = kD*Albedo*lightColor*NdotL;
+                half3 directDiffuse = kD*Albedo*lightColor*NdotL * shadow;
 
                 //直接光颜色
                 half3 directColor = directDiffuse + directSpecular;
@@ -146,11 +156,60 @@
                 //间接光颜色
                 half3 indirColor = indirSpecularColor + indirDiffuseColor;
 
-                half3 fragColor = directColor + indirColor;
+
+                half3 ambient = half3(unity_SHAr.w, unity_SHAg.w, unity_SHAb.w);
+                half3 fragColor = directColor + indirColor * ambient;
 
                 return half4(fragColor,1.0);
             }
             ENDHLSL
         }
+
+        Pass
+        {
+            Tags
+            {
+                "LightMode" = "ShadowCaster"
+            }
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+			struct a2v
+			{
+				float4 vertex : POSITION;
+				float3 normal : NORMAL;
+			};
+
+			struct v2f
+			{
+				float4 clipPos : SV_POSITION;
+			};
+
+			float3 _LightDirection;
+
+			v2f vert(a2v v)
+			{
+				v2f o;
+
+				float3 positionWS = TransformObjectToWorld(v.vertex.xyz);
+				float3 normalWS = TransformObjectToWorldDir(v.normal);
+				float4 clipPos = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection));
+				o.clipPos = clipPos;
+				return o;
+			}
+
+			half4 frag(v2f i) : SV_TARGET
+			{
+				return 0;
+			}
+
+            ENDHLSL
+
+        }
+        UsePass "Universal Render Pipeline/Terrain/Lit/DepthNormals"
+        UsePass "Universal Render Pipeline/Terrain/Lit/DepthOnly"
     }
 }
