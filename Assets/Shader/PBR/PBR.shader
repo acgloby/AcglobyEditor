@@ -115,7 +115,7 @@
                 half3 N = normalize(unpack_normal.x * i.tangent * _NormalScale + unpack_normal.y * i.bitangent * _NormalScale + unpack_normal.z * i.normal);
                 half3 L = normalize(light.direction);
                 half3 V = normalize(_WorldSpaceCameraPos - i.worldPos);
-                half3 H = normalize(V + L);
+                half3 H = normalize(_WorldSpaceCameraPos - i.worldPos + light.direction);
                 half3 R = reflect(-L, N);
 
                 half NdotV = max(dot(N, V), 0.000001);
@@ -127,36 +127,38 @@
                 half3 F0 = half3(0.04, 0.04, 0.04);
                 F0 = lerp(F0, Albedo, Metallic);
 
+                //BRDF
                 half D = D_Function(NdotH, Roughness);
                 half G = G_Function(NdotL, NdotV, Roughness);
                 half3 F = F_Function(HdotL, F0);
                 //直接光高光
                 half3 directSpecular = D * G * F / (4.0 * NdotL * NdotV);
-
+                //直接光高光颜色
+                half3 directSpecularColor = directSpecular * lightColor * NdotL * PI;
                 half3 kS = F;
-                half3 kD = (1-kS)*(1-Metallic);
+                half3 kD = (1 - kS) * (1 - Metallic);
+                //阴影
                 half shadow = MainLightRealtimeShadow(TransformWorldToShadowCoord(i.worldPos));
-                //直接光漫反射
-                half3 directDiffuse = kD*Albedo*lightColor*NdotL * shadow;
-
+                //直接光漫反射颜色
+                half3 directDiffuseColor = kD * Albedo * lightColor * NdotL * shadow;
                 //直接光颜色
-                half3 directColor = directDiffuse + directSpecular;
+                half3 directColor = directDiffuseColor + directSpecularColor;
 
                 //间接光漫反射
-                half3 shColor = SH_IndirectionDiffuse(N)*Ao;
-                half3 indirKS = IndirFresnelSchlick(NdotV,F0,Roughness);
-                half3 indirKD = (1-indirKS)*(1-Metallic);
-                half3 indirDiffuseColor = shColor*indirKD*Albedo;
+                half3 shColor = SH_IndirectionDiffuse(N) * Ao;
+                half3 indirKS = IndirFresnelSchlick(NdotV, F0, Roughness);
+                half3 indirKD = (1 - indirKS) * (1 - Metallic);
+                half3 indirDiffuseColor = shColor * indirKD * Albedo;
                 
                 //间接光高光
-                half3 indirSpecularCubeColor = IndirSpecularCube(N,V,Roughness,Ao);
-                half3 indirSpecularCubeFactor = IndirSpecularFactor(Roughness,Smoothness,directSpecular,F0,NdotV);
+                half3 indirSpecularCubeColor = IndirSpecularCube(N, V, Roughness,Ao);
+                half3 indirSpecularCubeFactor = IndirSpecularFactor(Roughness, Smoothness, directSpecular, F0, NdotV);
                 half3 indirSpecularColor = indirSpecularCubeColor * indirSpecularCubeFactor;
                 
                 //间接光颜色
                 half3 indirColor = indirSpecularColor + indirDiffuseColor;
 
-
+                //环境光
                 half3 ambient = half3(unity_SHAr.w, unity_SHAg.w, unity_SHAb.w);
                 half3 fragColor = directColor + indirColor * ambient;
 
