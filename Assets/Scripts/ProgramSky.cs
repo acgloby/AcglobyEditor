@@ -1,9 +1,19 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 
 [ExecuteInEditMode]
 public class ProgramSky : MonoBehaviour
 {
+    [System.Serializable]
+    public struct SkyColor
+    {
+        public float SkyTime;
+        public Gradient Color;
+        public Color LightColor;
+        public Color CloudColor;
+    }
+
     public bool OnAurora = true;
     [Range(0,24)]
     public float m_skyTime = 8;
@@ -16,6 +26,9 @@ public class ProgramSky : MonoBehaviour
     private List<SkyColor> dayColorList = new List<SkyColor>();
     [SerializeField]
     private List<SkyColor> nightColorList = new List<SkyColor>();
+
+    private const float DAY_SPET = 5;
+    private const float NIGHT_SPET = 18;
 
     //每小时的角度
     private const float TIME_STEP = 15f;
@@ -82,7 +95,7 @@ public class ProgramSky : MonoBehaviour
     {
         Color cloudColor = Color.white;
         var data = IsNight() ? nightColorList : dayColorList;
-        var tempTime = SkyTime >= 0 && SkyTime < 5 ? 24 + SkyTime : SkyTime;
+        var tempTime = SkyTime >= 0 && SkyTime < DAY_SPET ? 24 + SkyTime : SkyTime;
         for (int i = 0; i < data.Count; i++)
         {
             if (data[i].SkyTime <= tempTime)
@@ -97,22 +110,20 @@ public class ProgramSky : MonoBehaviour
     private Color GetCurLightColor()
     {
         Color lightColor = Color.white;
-        var data = IsNight() ? nightColorList : dayColorList;
-        var tempTime = SkyTime >= 0 && SkyTime < 5 ? 24 + SkyTime : SkyTime;
-        for (int i = 0; i < data.Count; i++)
+        if (nextColor.SkyTime - SkyTime <= 1 && nextColor.SkyTime - SkyTime > 0)
         {
-            if(data[i].SkyTime <= tempTime)
-            {
-                lightColor = data[i].LightColor;
-            }
+            lightColor = Color.Lerp(nextColor.LightColor, curColor.LightColor, nextColor.SkyTime - SkyTime);
         }
-
+        else
+        {
+            lightColor = curColor.LightColor;
+        }
         return lightColor;
     }
 
     private bool IsNight()
     {
-        return SkyTime < 5 || SkyTime > 18;
+        return SkyTime < DAY_SPET || SkyTime >= NIGHT_SPET;
     }
 
     /// <summary>
@@ -132,40 +143,6 @@ public class ProgramSky : MonoBehaviour
     /// </summary>
     private void UpdateSkyColor()
     {
-        if (dayColorList.Count > 1)
-        {
-            for (int i = 0; i < dayColorList.Count; i++)
-            {
-                if (SkyTime >= dayColorList[i].SkyTime)
-                {
-                    curDayColorIndex = i;
-                }
-            }
-
-            var nextDayColorIndex = curDayColorIndex == dayColorList.Count - 1 ? 0 : curDayColorIndex + 1;
-            curColor = dayColorList[curDayColorIndex];
-            nextColor = dayColorList[nextDayColorIndex];
-            for (int i = 0; i < 3; i++)
-            {
-                if (nextColor.SkyTime - SkyTime <= 1 && nextColor.SkyTime - SkyTime > 0)
-                {
-                    var col = Color.Lerp(nextColor.Color.colorKeys[i].color, curColor.Color.colorKeys[i].color, nextColor.SkyTime - SkyTime);
-                    DayColorDatas.Add(col);
-                }
-                else
-                {
-                    DayColorDatas.Add(curColor.Color.colorKeys[i].color);
-                }
-            }
-        }
-        else if (dayColorList.Count == 1)
-        {
-            curColor = dayColorList[0];
-            for (int i = 0; i < curColor.Color.colorKeys.Length; i++)
-            {
-                DayColorDatas.Add(curColor.Color.colorKeys[i].color);
-            }
-        }
         if (IsNight())
         {
             if (nightColorList.Count > 1)
@@ -179,7 +156,15 @@ public class ProgramSky : MonoBehaviour
                 }
                 var nextNightColorIndex = curNightColorIndex == nightColorList.Count - 1 ? 0 : curNightColorIndex + 1;
                 curColor = nightColorList[curNightColorIndex];
-                nextColor = nightColorList[nextNightColorIndex];
+                //夜晚->白天切换过渡
+                if (DAY_SPET - SkyTime < 1 && dayColorList.Count > 0)
+                {
+                    nextColor = dayColorList[0];
+                }
+                else
+                {
+                    nextColor = nightColorList[nextNightColorIndex];
+                }
                 for (int i = 0; i < 3; i++)
                 {
                     if (nextColor.SkyTime - SkyTime <= 1 && nextColor.SkyTime - SkyTime > 0)
@@ -196,9 +181,59 @@ public class ProgramSky : MonoBehaviour
             else if (nightColorList.Count == 1)
             {
                 curColor = nightColorList[0];
+                //夜晚->白天切换过渡
+                if (DAY_SPET - SkyTime < 1 && dayColorList.Count > 0)
+                {
+                    nextColor = dayColorList[0];
+                }
                 for (int i = 0; i < curColor.Color.colorKeys.Length; i++)
                 {
                     NightColorDatas.Add(curColor.Color.colorKeys[i].color);
+                }
+            }
+        }
+        else
+        {
+            if (dayColorList.Count > 1)
+            {
+                for (int i = 0; i < dayColorList.Count; i++)
+                {
+                    if (SkyTime >= dayColorList[i].SkyTime)
+                    {
+                        curDayColorIndex = i;
+                    }
+                }
+
+                var nextDayColorIndex = curDayColorIndex == dayColorList.Count - 1 ? 0 : curDayColorIndex + 1;
+                curColor = dayColorList[curDayColorIndex];
+                //白天->夜晚切换过渡
+                if (NIGHT_SPET - SkyTime < 1 && nightColorList.Count > 0)
+                {
+                    nextColor = nightColorList[0];
+                }
+                else
+                {
+                    nextColor = dayColorList[nextDayColorIndex];
+                }
+                for (int i = 0; i < 3; i++)
+                {
+                    if (nextColor.SkyTime - SkyTime < 1 && nextColor.SkyTime - SkyTime > 0)
+                    {
+                        var col = Color.Lerp(nextColor.Color.colorKeys[i].color, curColor.Color.colorKeys[i].color, nextColor.SkyTime - SkyTime);
+                        DayColorDatas.Add(col);
+                    }
+                    else
+                    {
+                        DayColorDatas.Add(curColor.Color.colorKeys[i].color);
+                    }
+                }
+            }
+            else if (dayColorList.Count == 1)
+            {
+                curColor = dayColorList[0];
+                for (int i = 0; i < curColor.Color.colorKeys.Length; i++)
+                {
+                    DayColorDatas.Add(curColor.Color.colorKeys[i].color);
                 }
             }
         }
@@ -259,57 +294,34 @@ public class ProgramSky : MonoBehaviour
     /// </summary>
     private void UpdateAmbient()
     {
-        var skyColor = Color.gray;
-        var equatorColor = Color.gray;
-        var groundColor = Color.gray;
-        for (int i = 0; i < DayColorDatas.Count; i++)
+        for (var i = 0; i < DayColorDatas.Count; i++)
         {
             var keyName = $"DayColor_{i}";
             programSkyMat.SetColor(keyName, DayColorDatas[i]);
-            switch (i)
-            {
-                case 0:
-                    groundColor = DayColorDatas[0];
-                    break;
-                case 1:
-                    equatorColor = DayColorDatas[1];
-                    break;
-                case 2:
-                    skyColor = DayColorDatas[2];
-                    break;
-            }
         }
-        for (int i = 0; i < NightColorDatas.Count; i++)
+        for (var i = 0; i < NightColorDatas.Count; i++)
         {
             var keyName = $"NightColor_{i}";
             programSkyMat.SetColor(keyName, NightColorDatas[i]);
-            switch (i)
-            {
-                case 0:
-                    groundColor = NightColorDatas[0];
-                    break;
-                case 1:
-                    equatorColor = NightColorDatas[1];
-                    break;
-                case 2:
-                    skyColor = NightColorDatas[2];
-                    break;
-            }
         }
 
+        Color skyColor, equatorColor, groundColor;
+        if (nextColor.SkyTime - SkyTime <= 1 && nextColor.SkyTime - SkyTime > 0)
+        {
+            groundColor = Color.Lerp(nextColor.Color.colorKeys[0].color, curColor.Color.colorKeys[0].color, nextColor.SkyTime - SkyTime);
+            equatorColor = Color.Lerp(nextColor.Color.colorKeys[1].color, curColor.Color.colorKeys[1].color, nextColor.SkyTime - SkyTime);
+            skyColor = Color.Lerp(nextColor.Color.colorKeys[2].color, curColor.Color.colorKeys[2].color, nextColor.SkyTime - SkyTime);
+        }
+        else
+        {
+            groundColor = curColor.Color.colorKeys[0].color;
+            equatorColor = curColor.Color.colorKeys[1].color;
+            skyColor = curColor.Color.colorKeys[2].color;
+        }
         RenderSettings.ambientSkyColor = skyColor;
         RenderSettings.ambientGroundColor = groundColor;
         RenderSettings.ambientEquatorColor = equatorColor;
         DayColorDatas.Clear();
         NightColorDatas.Clear();
     }
-}
-
-[System.Serializable]
-public struct SkyColor
-{
-    public float SkyTime;
-    public Gradient Color;
-    public Color LightColor;
-    public Color CloudColor;
 }
