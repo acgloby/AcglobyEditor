@@ -27,8 +27,8 @@ public class ProgramSky : MonoBehaviour
     [SerializeField]
     private List<SkyColor> nightColorList = new List<SkyColor>();
 
-    private const float DAY_SPET = 5;
-    private const float NIGHT_SPET = 18;
+    private const float DAY_SPET = 6;
+    private const float NIGHT_SPET = 19;
 
     //每小时的角度
     private const float TIME_STEP = 15f;

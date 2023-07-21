@@ -40,7 +40,8 @@ MonoBehaviour:
       type: 3}
   m_RendererFeatures:
   - {fileID: -1878332245247344467}
-  m_RendererFeatureMap: adc0de57c6d2eee5
+  - {fileID: 684159299862980127}
+  m_RendererFeatureMap: adc0de57c6d2eee51fe61c26429f7e09
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -81,3 +82,22 @@ MonoBehaviour:
   m_ClusteredRendering: 0
   m_TileSize: 32
   m_IntermediateTextureMode: 1
+--- !u!114 &684159299862980127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90280b2afddb15c418e6c344986c8959, type: 3}
+  m_Name: VolumetricLight
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  setting:
+    passEvent: 550
+    shader: {fileID: 4800000, guid: de33bfa338f06da418ccdf24b7ee617c, type: 3}
+    intensity: 0.5
+    stepTimes: 16
+    blurRange: 0.1

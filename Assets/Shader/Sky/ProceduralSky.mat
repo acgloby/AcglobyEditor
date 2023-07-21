@@ -26,8 +26,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CloudNoiseTex1:
-        m_Texture: {fileID: 2800000, guid: 7a12d6df4af23f242a90c70e856610c9, type: 3}
-        m_Scale: {x: 0.2, y: 0.15}
+        m_Texture: {fileID: 2800000, guid: d0ee7512904c2df49b4c7acb09a17211, type: 3}
+        m_Scale: {x: 0.3, y: 0.3}
         m_Offset: {x: 0, y: 0}
     - _CloudNoiseTex2:
         m_Texture: {fileID: 2800000, guid: d0ee7512904c2df49b4c7acb09a17211, type: 3}
@@ -65,7 +65,7 @@ Material:
     - _CloudOffset: 0.02
     - _CloudPower: 1
     - _CloudSpeed: 0.5
-    - _CloudStep: 0.117
+    - _CloudStep: 0
     - _CloudStepHight: 0.226
     - _DayHorStrenth: 0.126
     - _DayHorWidth: 0.017
@@ -83,7 +83,7 @@ Material:
     - _MieG: 0.7
     - _MieStrength: 0.5
     - _MoonMask: 1
-    - _MoonSize: 0.1
+    - _MoonSize: 0.07
     - _NightHorStrenth: 0.2
     - _NightHorWidth: 0.1
     - _PlanetRadius: 500
@@ -96,16 +96,16 @@ Material:
     - _SunSize: 0.08
     m_Colors:
     - _CloudBackColor: {r: 0.21698111, g: 0.12588999, b: 0.12588999, a: 1}
-    - _CloudColor: {r: 0.37899658, g: 0.30807003, b: 0.31597552, a: 1}
+    - _CloudColor: {r: 0.96862745, g: 0.97056174, b: 0.972549, a: 1}
     - _CloudColorHight: {r: 0.8490566, g: 0.8490566, b: 0.8490566, a: 1}
     - _CloudFrontColor: {r: 1, g: 0.43867922, b: 0.43867922, a: 1}
     - _DayHorColor: {r: 0.99272245, g: 1.1036412, b: 1.1646465, a: 1}
     - _HorizonDayColor: {r: 0.12766999, g: 0.16059405, b: 0.1792453, a: 1}
     - _HorizonNightColor: {r: 0.01655392, g: 0.028407838, b: 0.03773582, a: 1}
-    - _MieColor: {r: 1.4980392, g: 0.5568628, b: 0, a: 1}
-    - _MoonColor: {r: 1.3082948, g: 1.4572909, b: 1.5849056, a: 1}
+    - _MieColor: {r: 1.6625506, g: 0.91215754, b: 0, a: 1}
+    - _MoonColor: {r: 2.0599558, g: 3.1519825, b: 3.1876688, a: 1}
     - _NightHorColor: {r: 0.010679956, g: 0.06517293, b: 0.1509434, a: 1}
     - _StarColor: {r: 6.7764707, g: 8.094118, b: 11.984314, a: 1}
     - _SunColor: {r: 2.6785963, g: 0.9841123, b: 0.341142, a: 1}
-    - _SunInfColor: {r: 3.545098, g: 1.7098039, b: 0.42352942, a: 1}
+    - _SunInfColor: {r: 0.754717, g: 0.19857596, b: 0, a: 1}
   m_BuildTextureStacks: []

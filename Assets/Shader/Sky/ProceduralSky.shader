@@ -10,7 +10,7 @@
         [Space(20)]
         _MoonTex("月亮贴图", 2D) = "black" {}
         [HDR]_MoonColor("月亮颜色", Color) = (1.0, 1.0, 1.0, 1.0)
-        _MoonSize("月亮大小", Range(0.1,1)) = 0.5
+        _MoonSize("月亮大小", Range(0.05,1)) = 0.05
         _MoonMask("月亮遮罩偏移",Range(-1,1)) = 0
         
         [Space(20)]
@@ -31,8 +31,7 @@
         _LitStrength("LitStrength" ,Range(0,1)) = 0.5
         _BackLitStrength("BackLitStrength" ,Range(0,1)) = 0.5
         _EdgeLitStrength("EdgeLitStrength" ,Range(0,1)) = 0.5
-
-
+        _CloudStep("CloudStep", Range(0,1)) = 0.5
 
 
         [Space(20)]
@@ -117,6 +116,7 @@
 
             half _CloudOffset;
             half _CloudSpeed;
+            half _CloudStep;
             half4 _CloudColor;
             TEXTURE2D(_CloudNoiseTex1);
             SAMPLER(sampler_CloudNoiseTex1);
@@ -331,6 +331,8 @@
             {
                 Light light = GetMainLight();
                 half3 lightDir =  normalize(light.direction);
+                half3 normalizeWorldPos = normalize(i.worldPos);
+                half disFormSun = max(0, 1 - distance(normalize(_MainLightPosition.xyz), normalizeWorldPos));
 
                 //---------------   太阳  -----------------
                 half sunDist = distance(i.uv.xyz , _MainLightPosition.xyz);
@@ -342,7 +344,7 @@
 
                 //---------------   月亮  -----------------
                 half3 sunUV = mul(i.uv.xyz, LToW);
-                half2 moonUV = sunUV.xy * _MoonTex_ST.xy * -1 * (1 / (_MoonSize + 0.0001)) + _MoonTex_ST.zw;
+                half2 moonUV = sunUV.xy * _MoonTex_ST.xy * -1 * (1 / _MoonSize) + _MoonTex_ST.zw;
                 moonUV = moonUV * 0.5 + 0.5;
                 half4 moonTex = SAMPLE_TEXTURE2D(_MoonTex, sampler_MoonTex, moonUV);
                 half4 moonMaskTex = SAMPLE_TEXTURE2D(_MoonTex, sampler_MoonTex, moonUV + half2(_MoonMask,0));
@@ -369,7 +371,7 @@
                 //---------------   大气  -----------------
                 half sunMask = smoothstep(-0.4,0.4,-mul(i.uv.xyz,LToW).z) - 0.3;
                 half sunInfScaleMask = smoothstep(-0.01,0.1,_MainLightPosition.y) * smoothstep(-0.4,-0.01,-_MainLightPosition.y);
-                half4 finalSunInfColor = _SunInfColor * sunMask * _SunInfScale * sunInfScaleMask;
+                half4 finalSunInfColor = _SunInfColor * sunMask * _SunInfScale * sunInfScaleMask * disFormSun;
                 //----------------------------------------------
                 
                 //---------------   地平线  -----------------
@@ -381,7 +383,6 @@
                 //----------------------------------------------
 
                 //---------------   星空  -----------------
-                half3 normalizeWorldPos = normalize(i.worldPos);
                 half2 skyuv = normalizeWorldPos.xz / max(0,normalizeWorldPos.y);
                 half4 starNoiseTex = SAMPLE_TEXTURE2D(_StarNoiseTex, sampler_StarNoiseTex, skyuv * _StarNoiseTex_ST.xy + (_StarNoiseTex_ST.zw - _MainLightPosition.xy * _StarSpeed * _Time.x));
                 half starNoise = step(starNoiseTex.r,0.7);
@@ -403,9 +404,9 @@
                 half cloudLight = saturate(cloudNoiseTex1.r - cloudNoiseTex12.r) * _LitStrength;
                 half cloudBackLight = saturate(cloudNoiseTex1.r + cloudNoiseTex13.r) * _BackLitStrength;
                 half cloudEdgeLight = pow(1 - cloudNoiseTex1.r,4) * _EdgeLitStrength;
-                half finalCloudLight = (cloudLight + cloudBackLight + cloudEdgeLight);
-                half cloudMask = skyMask * stepCloud;
-                half3 cloudColor = lerp(light.color.rgb,_CloudColor,finalCloudLight);
+                half finalCloudLight = cloudLight + cloudBackLight + cloudEdgeLight + disFormSun;
+                half cloudMask = skyMask * saturate(stepCloud + _CloudStep);
+                half3 cloudColor = lerp(light.color.rgb, _CloudColor, finalCloudLight);
               
                 //星星、月亮、太阳置于云后
                 starColor *= (1 - cloudMask);
@@ -435,7 +436,6 @@
                 //---------------------------------------------
 
                 //---------------  极光  ------------------
-                // 极光消耗巨大,不适用
                 #if _USE_AURORA
                     half3 n = normalize(i.uv);
                     half4 auroraCol = smoothstep(0, 1.5, aurora(float3(0, 0, -6.7), n)) * skyMask;
@@ -443,7 +443,7 @@
                 //---------------------------------------------
 
                 half3 fragColor = finalSkyColor + starColor + scatteringColor + finalSunColor + finalMoonColor + finalSunInfColor;
-                fragColor = lerp(fragColor,cloudColor,cloudMask);
+                fragColor = lerp(fragColor, cloudColor, cloudMask);
                 #if _USE_AURORA
                     fragColor = lerp(fragColor,auroraCol.rgb,auroraCol.a * (1 - sunNightStep));
                 #endif

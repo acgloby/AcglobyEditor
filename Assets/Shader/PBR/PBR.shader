@@ -11,6 +11,10 @@
         _MetallicTex ("Metallic Texture", 2D) = "white" {}
         _Roughness("Roughness",Range(0,1)) = 0.5
         _Metallic("Metallic", Range(0,1)) = 0.5
+
+        _StepTime("Step Time", float) = 1
+        _MaxStep("Max Step", float) = 20
+        _LightIntensity("Light Intensity", float) = 1
     }
     SubShader
     {
@@ -27,6 +31,7 @@
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
             #include "PBRFunction.hlsl"
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS //主光源阴影
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE //主光源层级阴影是否开启
@@ -80,6 +85,25 @@
             float _Roughness;
             float _Metallic;
 
+            float _MaxStep;
+            float _StepTime;
+            float _LightIntensity;
+
+            half GetShadow(float3 worldPos)
+            {
+                return MainLightRealtimeShadow(TransformWorldToShadowCoord(worldPos));
+            }
+
+            float3 GetWorldPosition(float3 positionHCS)
+            {
+                float2 UV = positionHCS.xy / _ScaledScreenParams.xy;
+                #if UNITY_REVERSED_Z
+                real depth = SampleSceneDepth(UV);
+                #else
+                real depth = lerp(UNITY_NEAR_CLIP_VALUE, 1, SampleSceneDepth(UV));
+                #endif
+                return ComputeWorldSpacePosition(UV, depth, UNITY_MATRIX_I_VP);
+            }
 
 
             v2f vert (appdata v)
@@ -138,7 +162,8 @@
                 half3 kS = F;
                 half3 kD = (1 - kS) * (1 - Metallic);
                 //阴影
-                half shadow = MainLightRealtimeShadow(TransformWorldToShadowCoord(i.worldPos));
+                half shadow = GetShadow(i.worldPos);
+
                 //直接光漫反射颜色
                 half3 directDiffuseColor = kD * Albedo * lightColor * NdotL * shadow;
                 //直接光颜色
@@ -161,6 +186,24 @@
                 //环境光
                 half3 ambient = half3(unity_SHAr.w, unity_SHAg.w, unity_SHAb.w);
                 half3 fragColor = directColor + indirColor * ambient;
+
+                half3 worldPos = GetWorldPosition(i.position);
+                half3 startPos = _WorldSpaceCameraPos;
+                half3 dir = normalize(worldPos - startPos);
+                half rayLength = length(worldPos - _WorldSpaceCameraPos);
+                rayLength = min(rayLength, _MaxStep);
+                half3 finalPos = startPos + dir * rayLength;
+                half3 intensity = 0;
+                half step = 1.0 / max(0.0001, _StepTime);
+                for(float i = 0; i < 1; i += step)
+                {
+                    half3 currentPostion = lerp(startPos, finalPos, i);
+                    float atten = GetShadow(currentPostion) * _LightIntensity;
+                    intensity += atten;
+                }
+
+                intensity /= max(0.0001, _StepTime);
+               
 
                 return half4(fragColor,1.0);
             }

@@ -22,7 +22,7 @@ Material:
     m_TexEnvs:
     - _WindDistortionMap:
         m_Texture: {fileID: 2800000, guid: 711b84611844ed84b809f6640048e24b, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 0.5, y: 0.5}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
@@ -30,7 +30,7 @@ Material:
     - _BladeCurve: 2
     - _BladeForward: 0.38
     - _BladeHeight: 3
-    - _BladeHeightRandom: 1
+    - _BladeHeightRandom: 0.5
     - _BladeWidth: 0.2
     - _BladeWidthRandom: 0.02
     - _TessellationUniform: 30

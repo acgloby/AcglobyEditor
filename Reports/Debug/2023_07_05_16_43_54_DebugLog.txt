@@ -1,0 +1,8 @@
+[2023-07-05 08:44:08.020][342][ERROR] Invalid editor window of type: UnityEditor.FallbackEditorWindow, title: Failed to load
+UnityEditor.GenericMenu:CatchMenu (object,string[],int)
+
+[2023-07-05 08:44:08.021][342][ERROR] Invalid editor window of type: UnityEditor.FallbackEditorWindow, title: Failed to load
+UnityEditor.GenericMenu:CatchMenu (object,string[],int)
+
+[2023-07-05 08:49:59.020][10399][WARNING] Assets\Scripts\ProgramSky.cs(36,19): warning CS0414: The field 'ProgramSky.MoonOffset' is assigned but its value is never used
+
