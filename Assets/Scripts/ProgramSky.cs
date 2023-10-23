@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
+using  UnityEngine.UI;
 
 [ExecuteInEditMode]
 public class ProgramSky : MonoBehaviour
@@ -18,6 +20,8 @@ public class ProgramSky : MonoBehaviour
     [Range(0,24)]
     public float m_skyTime = 8;
     public float TimeSpeed = 1;
+    public Text TimeShowText;
+
     public Vector2 CloudDirection;
     private Light sun;
     private Material programSkyMat;
@@ -44,6 +48,8 @@ public class ProgramSky : MonoBehaviour
     private SkyColor nextColor;
 
 
+    private  StringBuilder stringBuilder = new StringBuilder();
+
     public float SkyTime
     {
         get => m_skyTime;
@@ -54,6 +60,13 @@ public class ProgramSky : MonoBehaviour
             {
                 m_skyTime -= 24;
             }
+
+            stringBuilder.AppendFormat("Time ");
+            stringBuilder.AppendFormat("{0:d2}", (int)SkyTime);
+            stringBuilder.AppendFormat(":");
+            stringBuilder.AppendFormat("{0:d2}", (int)((SkyTime - (int)SkyTime) * 60));
+            TimeShowText.text = stringBuilder.ToString();
+            stringBuilder.Clear();
         }
     }
 
@@ -165,7 +178,7 @@ public class ProgramSky : MonoBehaviour
                 {
                     nextColor = nightColorList[nextNightColorIndex];
                 }
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     if (nextColor.SkyTime - SkyTime <= 1 && nextColor.SkyTime - SkyTime > 0)
                     {
@@ -215,7 +228,7 @@ public class ProgramSky : MonoBehaviour
                 {
                     nextColor = dayColorList[nextDayColorIndex];
                 }
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     if (nextColor.SkyTime - SkyTime < 1 && nextColor.SkyTime - SkyTime > 0)
                     {
@@ -308,15 +321,15 @@ public class ProgramSky : MonoBehaviour
         Color skyColor, equatorColor, groundColor;
         if (nextColor.SkyTime - SkyTime <= 1 && nextColor.SkyTime - SkyTime > 0)
         {
-            groundColor = Color.Lerp(nextColor.Color.colorKeys[0].color, curColor.Color.colorKeys[0].color, nextColor.SkyTime - SkyTime);
+            groundColor = Color.Lerp(nextColor.Color.colorKeys[1].color, curColor.Color.colorKeys[1].color, nextColor.SkyTime - SkyTime);
             equatorColor = Color.Lerp(nextColor.Color.colorKeys[1].color, curColor.Color.colorKeys[1].color, nextColor.SkyTime - SkyTime);
-            skyColor = Color.Lerp(nextColor.Color.colorKeys[2].color, curColor.Color.colorKeys[2].color, nextColor.SkyTime - SkyTime);
+            skyColor = Color.Lerp(nextColor.Color.colorKeys[0].color, curColor.Color.colorKeys[0].color, nextColor.SkyTime - SkyTime);
         }
         else
         {
-            groundColor = curColor.Color.colorKeys[0].color;
+            groundColor = curColor.Color.colorKeys[1].color;
             equatorColor = curColor.Color.colorKeys[1].color;
-            skyColor = curColor.Color.colorKeys[2].color;
+            skyColor = curColor.Color.colorKeys[0].color;
         }
         RenderSettings.ambientSkyColor = skyColor;
         RenderSettings.ambientGroundColor = groundColor;

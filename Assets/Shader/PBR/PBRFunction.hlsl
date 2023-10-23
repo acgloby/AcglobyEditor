@@ -1,18 +1,12 @@
 #ifndef PBR_Function_INCLUDE
 #define PBR_Function_INCLUDE
 
-//D项 法线微表面分布函数 
+//D项 正态分布函数 
 half D_Function(half NdotH,half roughness)
 {
-    half a2 = roughness * roughness;
-    half dotNH2 = NdotH * NdotH;
-    
-    //分子
-    half nom = a2;
-    //分母
-    half denom = dotNH2 * (a2 - 1) + 1;
-    denom = denom * denom * PI;
-    return nom / denom;
+    half lerpSquareRoughness = pow(lerp(0.002, 1, roughness), 2);
+    half D = lerpSquareRoughness / (pow((pow(NdotH, 2) * (lerpSquareRoughness - 1) + 1), 2) * PI);
+    return D;
 }
 
 //G项子项

@@ -35,6 +35,7 @@
 
 
         [Space(20)]
+        _SkyStepOffset("天空渐变范围",Range(0,1)) = 0.5
         _DayHorWidth("地平线白天宽度",Range(0,1)) = 0.5
         _NightHorWidth("地平线夜晚宽度",Range(0,1)) = 0.5
         _DayHorStrenth("地平线白天强度",Range(0,1)) = 0.5
@@ -125,7 +126,7 @@
             half _BackLitStrength;
             half _EdgeLitStrength;
 
-
+            half _SkyStepOffset;
             half _DayHorWidth;
             half _NightHorWidth;
             half _DayHorStrenth;
@@ -147,10 +148,8 @@
             uniform Matrix LToW;
             uniform float4 DayColor_0;
             uniform float4 DayColor_1;
-            uniform float4 DayColor_2;
             uniform float4 NightColor_0;
             uniform float4 NightColor_1;
-            uniform float4 NightColor_2;
             uniform float4 CloudDirection;
             uniform float TimeSpeed;
 
@@ -332,7 +331,7 @@
                 Light light = GetMainLight();
                 half3 lightDir =  normalize(light.direction);
                 half3 normalizeWorldPos = normalize(i.worldPos);
-                half disFormSun = max(0, 1 - distance(normalize(_MainLightPosition.xyz), normalizeWorldPos));
+                half disFormSun = max(0, 0.5 - distance(normalize(_MainLightPosition.xyz), normalizeWorldPos));
 
                 //---------------   太阳  -----------------
                 half sunDist = distance(i.uv.xyz , _MainLightPosition.xyz);
@@ -350,18 +349,15 @@
                 half4 moonMaskTex = SAMPLE_TEXTURE2D(_MoonTex, sampler_MoonTex, moonUV + half2(_MoonMask,0));
                 half moonMask = max(0,1 - (moonMaskTex.a * step(0,sunUV.z))) * moonTex.a * step(0,sunUV.z);
                 half3 finalMoonColor = _MoonColor.rgb * moonTex.rgb * moonMask;
-                half moonDist = distance(i.uv.xyz , -_MainLightPosition.xyz);
-                half3 moonLight = saturate((1 - moonDist - 0.4)) * (1 - moonMask) * 0.5;
-                finalMoonColor = lerp(finalMoonColor,moonLight,moonLight.r);
                 //----------------------------------------------
 
                 //---------------   天空颜色  -----------------
-                half3 dayTopColor = lerp(DayColor_1, DayColor_0, saturate(i.uv.y)) * step(0,i.uv.y);
-                half3 dayBottomColor = lerp(DayColor_1, DayColor_2, saturate(-i.uv.y)) * step(0,-i.uv.y);
+                half3 dayTopColor = lerp(DayColor_1, DayColor_0, saturate(i.uv.y + _SkyStepOffset)) * step(0,i.uv.y);
+                half3 dayBottomColor = lerp(DayColor_1, DayColor_0, saturate(-i.uv.y + _SkyStepOffset)) * step(0,-i.uv.y);
                 half3 dayColor = saturate(dayTopColor + dayBottomColor);
 
-                half3 nightTopColor = lerp(NightColor_1, NightColor_0, saturate(i.uv.y))*step(0,i.uv.y);
-                half3 nightBottomColor = lerp(NightColor_1, NightColor_2, saturate(-i.uv.y))*step(0,-i.uv.y);
+                half3 nightTopColor = lerp(NightColor_1, NightColor_0, saturate(i.uv.y + _SkyStepOffset))*step(0,i.uv.y);
+                half3 nightBottomColor = lerp(NightColor_1, NightColor_0, saturate(-i.uv.y + _SkyStepOffset))*step(0,-i.uv.y);
                 half3 nightColor = saturate(nightTopColor + nightBottomColor);
                 
                 half sunNightStep = smoothstep(-0.3,0.25,_MainLightPosition.y);
@@ -389,25 +385,29 @@
                 half4 starTex = SAMPLE_TEXTURE2D(_StarTex, sampler_StarTex, skyuv * _StarTex_ST.xy + (_StarTex_ST.zw + half2(0, -1) * _StarSpeed * TimeSpeed * _Time.x));
                 half3 starColor = starTex.rbg * _StarColor * starNoise;
                 half skyMask = saturate(1 - smoothstep(-0.7,0,-i.uv.y));
-                half starMask = lerp(skyMask,0,sunNightStep);
+                half starMask = lerp(skyMask, 0, sunNightStep);
                 starColor *= starMask * (1 - moonTex.a);
                 //----------------------------------------------
                 
                 //---------------   云   -----------------
                 half2 clouduv = normalizeWorldPos.xz / max(0,normalizeWorldPos.y + 0.2);
                 half2 cloudOffset = _CloudNoiseTex1_ST.zw - CloudDirection.xy * _CloudSpeed * _Time.x;
-                half4 cloudNoiseTex1 = cloudCoord(clouduv,cloudOffset);
-                half4 cloudNoiseTex12 =  cloudCoord(clouduv,cloudOffset + lightDir.xz * _CloudOffset);
-                half4 cloudNoiseTex13 = cloudCoord(clouduv,cloudOffset -  lightDir.xz * _CloudOffset);
+                // half4 cloudNoiseTex1 = step(_CloudStep, cloudCoord(clouduv, cloudOffset));
+                // half4 cloudNoiseTex2 = step(_CloudStep, cloudCoord(clouduv, lightDir.xz * _CloudOffset + cloudOffset));
+                // half4 cloudNoiseTex3 = step(_CloudStep, cloudCoord(clouduv, -lightDir.xz * _CloudOffset + cloudOffset));
 
-                half stepCloud = cloudNoiseTex1.r * cloudNoiseTex12.r * cloudNoiseTex13.r;
-                half cloudLight = saturate(cloudNoiseTex1.r - cloudNoiseTex12.r) * _LitStrength;
-                half cloudBackLight = saturate(cloudNoiseTex1.r + cloudNoiseTex13.r) * _BackLitStrength;
-                half cloudEdgeLight = pow(1 - cloudNoiseTex1.r,4) * _EdgeLitStrength;
-                half finalCloudLight = cloudLight + cloudBackLight + cloudEdgeLight + disFormSun;
-                half cloudMask = skyMask * saturate(stepCloud + _CloudStep);
-                half3 cloudColor = lerp(light.color.rgb, _CloudColor, finalCloudLight);
-              
+                half4 cloudNoiseTex1 = cloudCoord(clouduv, cloudOffset);
+                half4 cloudNoiseTex2 = cloudCoord(clouduv, lightDir.xz * _CloudOffset * cloudOffset);
+                half4 cloudNoiseTex3 = cloudCoord(clouduv, -lightDir.xz * _CloudOffset * cloudOffset);
+
+                half cloudEdgeLight = pow(1 - cloudNoiseTex1.r, 8) * _EdgeLitStrength;
+                half cloudLight = saturate(cloudEdgeLight - cloudNoiseTex2.r - cloudNoiseTex1.r) * _LitStrength;
+                half cloudBackLight = saturate(cloudEdgeLight - cloudNoiseTex3.r - cloudNoiseTex1.r) * _BackLitStrength;
+               
+
+                half finalLit = saturate(cloudEdgeLight + cloudBackLight + cloudBackLight);
+                half cloudMask = finalLit * skyMask;
+                half3 cloudColor = lerp(light.color * cloudMask, _CloudColor * cloudMask , finalLit);
                 //星星、月亮、太阳置于云后
                 starColor *= (1 - cloudMask);
                 finalMoonColor *= (1 - cloudMask);
@@ -434,20 +434,16 @@
                 half4 inscattering = IntegrateInscattering(rayStart, rayDir, rayLength, -light.direction.xyz, 16);
                 scatteringColor = _MieColor * _MieStrength * inscattering.rgb * sunNightStep;
                 //---------------------------------------------
-
+                half3 fragColor = finalSkyColor + starColor + scatteringColor + finalSunColor + finalMoonColor + finalSunInfColor + cloudColor;
+                
                 //---------------  极光  ------------------
                 #if _USE_AURORA
                     half3 n = normalize(i.uv);
                     half4 auroraCol = smoothstep(0, 1.5, aurora(float3(0, 0, -6.7), n)) * skyMask;
+                     fragColor = lerp(fragColor, auroraCol.rgb, auroraCol.a * (1 - sunNightStep) * (1 - cloudMask));
                 #endif
                 //---------------------------------------------
 
-                half3 fragColor = finalSkyColor + starColor + scatteringColor + finalSunColor + finalMoonColor + finalSunInfColor;
-                fragColor = lerp(fragColor, cloudColor, cloudMask);
-                #if _USE_AURORA
-                    fragColor = lerp(fragColor,auroraCol.rgb,auroraCol.a * (1 - sunNightStep));
-                #endif
-               
                 return half4(fragColor,1.0);
             }
             ENDHLSL

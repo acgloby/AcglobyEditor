@@ -187,24 +187,6 @@
                 half3 ambient = half3(unity_SHAr.w, unity_SHAg.w, unity_SHAb.w);
                 half3 fragColor = directColor + indirColor * ambient;
 
-                half3 worldPos = GetWorldPosition(i.position);
-                half3 startPos = _WorldSpaceCameraPos;
-                half3 dir = normalize(worldPos - startPos);
-                half rayLength = length(worldPos - _WorldSpaceCameraPos);
-                rayLength = min(rayLength, _MaxStep);
-                half3 finalPos = startPos + dir * rayLength;
-                half3 intensity = 0;
-                half step = 1.0 / max(0.0001, _StepTime);
-                for(float i = 0; i < 1; i += step)
-                {
-                    half3 currentPostion = lerp(startPos, finalPos, i);
-                    float atten = GetShadow(currentPostion) * _LightIntensity;
-                    intensity += atten;
-                }
-
-                intensity /= max(0.0001, _StepTime);
-               
-
                 return half4(fragColor,1.0);
             }
             ENDHLSL
