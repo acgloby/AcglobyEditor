@@ -20,9 +20,9 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0, g: 0.0050826375, b: 0.009433985, a: 1}
-  m_AmbientEquatorColor: {r: 0, g: 0.009170494, b: 0.01886791, a: 1}
-  m_AmbientGroundColor: {r: 0, g: 0.009170494, b: 0.01886791, a: 1}
+  m_AmbientSkyColor: {r: 0.09411765, g: 0.29411766, b: 0.60784316, a: 1}
+  m_AmbientEquatorColor: {r: 0.75686276, g: 0.85882354, b: 0.9137255, a: 1}
+  m_AmbientGroundColor: {r: 0.75686276, g: 0.85882354, b: 0.9137255, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
@@ -290,7 +290,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 0.12989499, g: 0.1981132, b: 0.17747411, a: 1}
+  m_Color: {r: 0.9150943, g: 0.9077031, b: 0.8935119, a: 1}
   m_Intensity: 0.2
   m_Range: 10
   m_SpotAngle: 30
@@ -348,7 +348,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 164070189}
-  m_LocalRotation: {x: -0.37402228, y: 0, z: 0, w: 0.9274197}
+  m_LocalRotation: {x: 0.6343933, y: 0, z: 0, w: 0.7730105}
   m_LocalPosition: {x: 0, y: 17.49, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -941,7 +941,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!154 &1302153022
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -1073,7 +1073,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Time  00:00
+  m_Text: Time 11:15
 --- !u!222 &1446346944
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1480,17 +1480,17 @@ PrefabInstance:
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
       propertyPath: nightColorList.Array.data[0].CloudColor.b
-      value: 0.2627451
+      value: 0.1981132
       objectReference: {fileID: 0}
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
       propertyPath: nightColorList.Array.data[0].CloudColor.g
-      value: 0.2601227
+      value: 0.19522846
       objectReference: {fileID: 0}
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
       propertyPath: nightColorList.Array.data[0].CloudColor.r
-      value: 0.17254902
+      value: 0.13176396
       objectReference: {fileID: 0}
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
@@ -1525,12 +1525,12 @@ PrefabInstance:
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
       propertyPath: nightColorList.Array.data[0].Color.key1.b
-      value: 0.01886791
+      value: 0.12138866
       objectReference: {fileID: 0}
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
       propertyPath: nightColorList.Array.data[0].Color.key1.g
-      value: 0.009170494
+      value: 0.122641504
       objectReference: {fileID: 0}
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
@@ -1570,17 +1570,17 @@ PrefabInstance:
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
       propertyPath: nightColorList.Array.data[0].LightColor.b
-      value: 0.17747411
+      value: 0.34361282
       objectReference: {fileID: 0}
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
       propertyPath: nightColorList.Array.data[0].LightColor.g
-      value: 0.1981132
+      value: 0.38679248
       objectReference: {fileID: 0}
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}
       propertyPath: nightColorList.Array.data[0].LightColor.r
-      value: 0.12989499
+      value: 0.2572535
       objectReference: {fileID: 0}
     - target: {fileID: 9060484926640585600, guid: 2ba50738ae87fdd4aa86282db5bb6e1f,
         type: 3}

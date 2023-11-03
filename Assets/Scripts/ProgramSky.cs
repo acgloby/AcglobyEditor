@@ -199,9 +199,14 @@ public class ProgramSky : MonoBehaviour
                 {
                     nextColor = dayColorList[0];
                 }
-                for (int i = 0; i < curColor.Color.colorKeys.Length; i++)
+                else
+                {
+                    nextColor = nightColorList[0];
+                }
+                for (int i = 0; i < 2; i++)
                 {
                     NightColorDatas.Add(curColor.Color.colorKeys[i].color);
+                    DayColorDatas.Add(nextColor.Color.colorKeys[i].color);
                 }
             }
         }
@@ -244,9 +249,14 @@ public class ProgramSky : MonoBehaviour
             else if (dayColorList.Count == 1)
             {
                 curColor = dayColorList[0];
-                for (int i = 0; i < curColor.Color.colorKeys.Length; i++)
+                if (NIGHT_SPET - SkyTime < 1 && nightColorList.Count > 0)
+                {
+                    nextColor = nightColorList[0];
+                }
+                for (int i = 0; i < 2; i++)
                 {
                     DayColorDatas.Add(curColor.Color.colorKeys[i].color);
+                    NightColorDatas.Add(nextColor.Color.colorKeys[i].color);
                 }
             }
         }

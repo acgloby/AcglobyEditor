@@ -62,7 +62,7 @@ Material:
     - _CloudClip: 0.217
     - _CloudFrontStep: 0.951
     - _CloudNoiseSpeed: 1
-    - _CloudOffset: 0.15
+    - _CloudOffset: 0.015
     - _CloudPower: 1
     - _CloudSpeed: 0.5
     - _CloudStep: 0.25
@@ -81,7 +81,7 @@ Material:
     - _HorizonIntensity: 1
     - _HorizonOffset: 1
     - _LitStrength: 1
-    - _MieG: 0.7
+    - _MieG: 0.3
     - _MieStrength: 0.5
     - _MoonMask: 1
     - _MoonSize: 0.07
@@ -92,7 +92,7 @@ Material:
     - _SkyStepOffset: 0.4
     - _StarSpeed: 0.2
     - _StarsCutoff: 0.161
-    - _SunInfScale: 0.1
+    - _SunInfScale: 0.4
     - _SunInnerBoundary: 0.348
     - _SunOuterBoundary: 0.568
     - _SunSize: 0.08
@@ -104,10 +104,10 @@ Material:
     - _DayHorColor: {r: 0.99272245, g: 1.1036412, b: 1.1646465, a: 1}
     - _HorizonDayColor: {r: 0.12766999, g: 0.16059405, b: 0.1792453, a: 1}
     - _HorizonNightColor: {r: 0.01655392, g: 0.028407838, b: 0.03773582, a: 1}
-    - _MieColor: {r: 1.6625506, g: 0.91215754, b: 0, a: 1}
+    - _MieColor: {r: 14.942635, g: 2.9393299, b: 0, a: 1}
     - _MoonColor: {r: 2.0599558, g: 3.1519825, b: 3.1876688, a: 1}
     - _NightHorColor: {r: 0.010679956, g: 0.06517293, b: 0.1509434, a: 1}
     - _StarColor: {r: 6.7764707, g: 8.094118, b: 11.984314, a: 1}
     - _SunColor: {r: 2.6785963, g: 0.9841123, b: 0.341142, a: 1}
-    - _SunInfColor: {r: 0.754717, g: 0.19857596, b: 0, a: 1}
+    - _SunInfColor: {r: 5.992157, g: 2.6039217, b: 0, a: 1}
   m_BuildTextureStacks: []
